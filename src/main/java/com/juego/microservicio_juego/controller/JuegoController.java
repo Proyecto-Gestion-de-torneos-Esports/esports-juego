@@ -3,6 +3,7 @@ package com.juego.microservicio_juego.controller;
 import com.juego.microservicio_juego.dto.JuegoRequestDTO;
 import com.juego.microservicio_juego.dto.JuegoResponseDTO;
 import com.juego.microservicio_juego.service.JuegoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +23,12 @@ public class JuegoController {
     }
 
     @PostMapping
-    public JuegoResponseDTO guardarJuego(@RequestBody JuegoRequestDTO juego){
+    public JuegoResponseDTO guardarJuego(@Valid @RequestBody JuegoRequestDTO juego){
         return juegoService.agregarJuego(juego);
     }
 
     @PutMapping("{id}")
-    public Optional<JuegoResponseDTO> modificarJuego(@PathVariable Long id, @RequestBody JuegoRequestDTO juego){
+    public Optional<JuegoResponseDTO> modificarJuego(@PathVariable Long id, @Valid @RequestBody JuegoRequestDTO juego){
         return juegoService.modificarJuego(id, juego);
     }
 

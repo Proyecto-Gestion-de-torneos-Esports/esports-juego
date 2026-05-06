@@ -2,6 +2,7 @@ package com.juego.microservicio_juego.controller;
 
 import com.juego.microservicio_juego.model.Plataforma;
 import com.juego.microservicio_juego.service.PlataformaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class PlataformaController {
     }
 
     @PostMapping
-    public Plataforma agregarPlataforma(@RequestBody Plataforma plataforma){
+    public Plataforma agregarPlataforma(@Valid @RequestBody Plataforma plataforma){
         return plataformaService.agregarPlataforma(plataforma);
     }
 
