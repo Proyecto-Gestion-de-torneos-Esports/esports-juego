@@ -1,5 +1,8 @@
 package com.juego.microservicio_juego.service;
 
+import com.juego.microservicio_juego.client.AuditoriaClient;
+import com.juego.microservicio_juego.dto.AuditoriaRequestDTO;
+import com.juego.microservicio_juego.dto.AuditoriaResponseDTO;
 import com.juego.microservicio_juego.dto.JuegoRequestDTO;
 import com.juego.microservicio_juego.dto.JuegoResponseDTO;
 import com.juego.microservicio_juego.model.Juego;
@@ -7,21 +10,23 @@ import com.juego.microservicio_juego.model.Plataforma;
 import com.juego.microservicio_juego.repository.JuegoRepository;
 import com.juego.microservicio_juego.repository.PlataformaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JuegoService {
 
     private final JuegoRepository juegoRepository;
-
     private final PlataformaRepository plataformaRepository;
+    private final AuditoriaClient auditoriaClient;
 
     private JuegoResponseDTO mapToDTO(Juego juego){
         return new JuegoResponseDTO(
@@ -51,6 +56,8 @@ public class JuegoService {
                 .collect(Collectors.toSet());
 
         Juego juego = new Juego(null, dto.getNombre(), dto.getGenero(), dto.getDistribuidor(), idPlataforma);
+        log.info("Juego creado con exito!");
+        generarAuditoria("Juego creado");
         return mapToDTO(juegoRepository.save(juego));
     }
 
@@ -66,12 +73,25 @@ public class JuegoService {
                     .collect(Collectors.toSet());
 
             existente.setPlataformas(idPlataforma);
+            log.info("Juego modificado con exito!");
+            generarAuditoria("Juego modificado");
             return mapToDTO(juegoRepository.save(existente));
         });
     }
 
     public void eliminarJuego(Long id){
         juegoRepository.deleteById(id);
+        log.info("Juego eliminado con exito!");
+        generarAuditoria("Juego eliminado");
+    }
+
+    public void generarAuditoria(String detalle){
+        AuditoriaRequestDTO dto = new AuditoriaRequestDTO();
+        LocalDate ahora = LocalDate.now();
+        dto.setDetalle(detalle);
+        dto.setFecha(ahora);
+
+        AuditoriaResponseDTO respuesta = auditoriaClient.generarAuditoria(dto);
     }
 
 
