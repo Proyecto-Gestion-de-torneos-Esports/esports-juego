@@ -108,6 +108,7 @@ public class JuegoService {
         dto.setDetalle(detalle);
         dto.setFecha(ahora);
         auditoriaClient.generarAuditoria(dto);
+        log.info("Auditoria generada con exito!");
     }
 
 
