@@ -1,7 +1,6 @@
 package com.juego.microservicio_juego.dto;
 
 
-import com.juego.microservicio_juego.model.Plataforma;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

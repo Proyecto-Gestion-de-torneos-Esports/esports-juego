@@ -10,6 +10,7 @@ import com.juego.microservicio_juego.model.Juego;
 import com.juego.microservicio_juego.model.Plataforma;
 import com.juego.microservicio_juego.repository.JuegoRepository;
 import com.juego.microservicio_juego.repository.PlataformaRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,11 +51,15 @@ public class JuegoService {
         Optional<Juego> juego = juegoRepository.findById(id);
 
         if(juego.isPresent()){
+            log.info("Juego con id {} encontrado con exito!",id);
             return juego.map(this::mapToDTO).orElseThrow();
+
         }
+        log.warn("Juego con id {} no encontrado",id);
         throw new JuegoNotFoundException("Juego con id "+id+" no encontrado");
     }
 
+    @Transactional
     public JuegoResponseDTO agregarJuego(JuegoRequestDTO dto){
         Set<Plataforma> idPlataforma = dto.getIdPlataformas().stream()
                 .map(plataformaId -> plataformaRepository.findById(plataformaId)
@@ -62,11 +67,12 @@ public class JuegoService {
                 .collect(Collectors.toSet());
 
         Juego juego = new Juego(null, dto.getNombre(), dto.getGenero(), dto.getDistribuidor(), idPlataforma);
-        log.info("Juego creado con exito!");
-        generarAuditoria("Juego creado");
+        log.info("Juego agregadc con exito!");
+        generarAuditoria("Se agrego un juego");
         return mapToDTO(juegoRepository.save(juego));
     }
 
+    @Transactional
     public JuegoResponseDTO modificarJuego(Long id, JuegoRequestDTO dto){
         Optional<Juego> juego = juegoRepository.findById(id);
 
@@ -87,10 +93,12 @@ public class JuegoService {
                 return mapToDTO(juegoRepository.save(existente));
             }).orElseThrow();
         }
+        log.warn("Error al actualizar, juego con id {} no encontrado",id);
         throw new JuegoNotFoundException("Juego con id "+id+" no encontrado");
 
     }
 
+    @Transactional
     public void eliminarJuego(Long id){
         Optional<Juego> juego = juegoRepository.findById(id);
 
@@ -99,9 +107,11 @@ public class JuegoService {
             log.info("Juego eliminado con exito!");
             generarAuditoria("Juego eliminado");
         }
+        log.warn("Error al eliminar, juego con id {} no encontrado",id);
         throw new JuegoNotFoundException("Juego con id "+id+" no encontrado");
     }
 
+    @Transactional
     public void generarAuditoria(String detalle){
         AuditoriaRequestDTO dto = new AuditoriaRequestDTO();
         LocalDate ahora = LocalDate.now();
